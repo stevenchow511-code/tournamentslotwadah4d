@@ -555,15 +555,6 @@
   let currentPage = 1;
   const rowsPerPage = 15;
 
-  // ANIMASI KONFETI SAAT PERTAMA KALI HALAMAN DIBUKA
-  window.addEventListener('load', () => {
-    if (typeof confetti === 'function') {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    }
   });
 
   function maskUsername(str) {
