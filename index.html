@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turnamen Kemerdekaan - Cyber Leaderboard</title>
+  <style>
+    :root {
+      --bg-color: #080711;
+      --card-bg: rgba(18, 16, 38, 0.7);
+      --border-color: rgba(0, 242, 254, 0.2);
+      --accent-cyan: #00f2fe;
+      --accent-magenta: #ff007f;
+      --accent-gold: #ffd700;
+      --text-main: #f0f3f9;
+      --text-muted: #8e9bb0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.08) 0%, transparent 40%);
+      padding-bottom: 50px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* Header Navbar */
+    header {
+      background: rgba(8, 7, 17, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: linear-gradient(45deg, var(--accent-cyan), var(--accent-magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    .btn-masuk {
+      background: linear-gradient(135deg, var(--accent-cyan), #4facfe);
+      color: #000;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+    }
+
+    .btn-masuk:hover {
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
+      transform: translateY(-2px);
+    }
+
+    .btn-daftar {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--accent-magenta);
+      box-shadow: 0 0 8px rgba(255, 0, 127, 0.2);
+    }
+
+    .btn-daftar:hover {
+      background: rgba(255, 0, 127, 0.1);
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
+      transform: translateY(-2px);
+    }
+
+    /* Banner Event */
+    .banner-wrapper {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .banner-content {
+      background: linear-gradient(135deg, #1f0036 0%, #001233 100%);
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .banner-title {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #fff;
+      text-shadow: 0 0 10px var(--accent-magenta);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .banner-subtitle {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* Info Status */
+    .meta-info {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: var(--card-bg);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .badge-highlight {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    /* Layout Content Grid */
+    .main-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 850px) {
+      .main-content { grid-template-columns: 1fr; }
+    }
+
+    /* Card Box */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    /* Search Container */
+    .search-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: #fff;
+      flex-grow: 1;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+    }
+
+    /* Table Styles */
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
+    th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 10px 12px; text-align: left; }
+    tbody tr { background: rgba(255, 255, 255, 0.02); transition: background 0.2s ease; }
+    tbody tr:hover { background: rgba(0, 242, 254, 0.05); }
+    td { padding: 12px; font-size: 14px; border-top: 1px solid rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.03); }
+    td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; font-weight: bold; }
+    td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+    .text-right { text-align: right; }
+    .score-highlight { color: var(--accent-cyan); font-weight: 600; font-family: 'Courier New', monospace; }
+
+    /* Top 3 Badge Badges */
+    .rank-top {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+      border-radius: 50%;
+      font-weight: bold;
+      color: #000;
+    }
+    .rank-1 { background: var(--accent-gold); box-shadow: 0 0 8px var(--accent-gold); }
+    .rank-2 { background: #e0e0e0; box-shadow: 0 0 8px #e0e0e0; }
+    .rank-3 { background: #cd7f32; box-shadow: 0 0 8px #cd7f32; }
+
+    /* Hadiah List */
+    .hadiah-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .hadiah-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.02); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.04); font-size: 13px; }
+    .hadiah-rank { font-weight: 700; color: var(--accent-magenta); }
+    .hadiah-prize { color: #fff; font-weight: 600; }
+
+    /* Pagination */
+    .pagination-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pagination { display: flex; gap: 6px; align-items: center; }
+    .page-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .page-btn:hover { border-color: var(--accent-cyan); }
+    .page-btn.active { background: var(--accent-cyan); color: #000; font-weight: bold; }
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .dots { color: var(--text-muted); padding: 0 4px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container nav-wrapper">
+      <div class="brand-title">CYBERARENA</div>
+      <div class="auth-buttons">
+        <a href="#" class="btn btn-masuk">Masuk</a>
+        <a href="#" class="btn btn-daftar">Daftar</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="banner-wrapper">
+      <div class="banner-content">
+        <h1 class="banner-title">TURNAMEN KEMERDEKAAN</h1>
+        <span class="banner-subtitle">PERIODE: 01 AGUSTUS - 31 AGUSTUS</span>
+      </div>
+    </div>
+
+    <div class="meta-info">
+      <div class="badge">Terakhir Update: 25-Agustus-2026<span class="badge-highlight" id="lastUpdateText"></span></div>
+      <div class="badge"><span class="badge-highlight" id="totalDataCount">0</span> Data Terdata</div>
+    </div>
+
+    <div class="main-content">
+      
+      <!-- Leaderboard -->
+      <div class="card">
+        <h2 class="card-title">Papan Klasemen</h2>
+        
+        <div class="search-container">
+          <input type="text" id="searchInput" class="search-input" placeholder="Cari username... (boleh ketik full ID)">
+          <button class="btn btn-masuk" onclick="handleSearch()">Search</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 15%;">No</th>
+                <th style="width: 45%;">Username</th>
+                <th style="width: 40%;" class="text-right">Turnover</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Data akan dimasukkan oleh JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-wrapper">
+          <div class="badge" id="dataRangeInfo">Menampilkan 0 data</div>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+
+      <!-- Hadiah List -->
+      <div class="card">
+        <h2 class="card-title">Daftar Hadiah</h2>
+        <div class="hadiah-list">
+          <div class="hadiah-item">
+            <span class="hadiah-rank" style="color: var(--accent-gold);">Juara 1</span>
+            <span class="hadiah-prize">All New Honda NMAX</span>
+          </div>
+          <div class="hadiah-item">
+            <span class="hadiah-rank" style="color: #e0e0e0;">Juara 2</span>
+            <span class="hadiah-prize">Galaxy Z Fold 8 ULTRA</span>
+          </div>
+          <div class="hadiah-item">
+            <span class="hadiah-rank" style="color: #cd7f32;">Juara 3</span>
+            <span class="hadiah-prize">iPhone 17 Pro Max</span>
+          </div>
+          <div class="hadiah-item">
+            <span class="hadiah-rank">Juara 4</span>
+            <span class="hadiah-prize">Rp 5.000.000</span>
+          </div>
+          <div class="hadiah-item">
+            <span class="hadiah-rank">Juara 5</span>
+            <span class="hadiah-prize">Rp 3.000.000</span>
+          </div>
+          <div class="hadiah-item">
+            <span class="hadiah-rank">Juara 6</span>
+            <span class="hadiah-prize">Rp 2.500.000</span>
+          </div>
+          <div class="hadiah-item">
+            <span class="hadiah-rank">Juara 7</span>
+            <span class="hadiah-prize">Rp 1.500.000</span>
+          </div>
+          <div class="hadiah-item">
+            <span class="hadiah-rank">Juara 8-10</span>
+            <span class="hadiah-prize">Rp 500.000 - Rp 1.000.000</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  let allData = [];
+  let filteredData = [];
+  let currentPage = 1;
+  const rowsPerPage = 15; // Mengatur 15 baris per halaman
+
+  // Fetch / Buka File data.txt
+  async function loadData() {
+    try {
+      const response = await fetch('data.txt');
+      const text = await response.text();
+      
+      const lines = text.split('\n').filter(line => line.trim() !== '');
+      allData = lines.map((line, index) => {
+        const parts = line.split(',');
+        return {
+          no: index + 1,
+          username: parts[0] ? parts[0].trim() : '',
+          turnover: parts[1] ? parts[1].trim() : '0'
+        };
+      });
+
+      filteredData = [...allData];
+      
+      // Update Meta Info
+      document.getElementById('totalDataCount').innerText = allData.length.toLocaleString('id-ID');
+      const now = new Date();
+      document.getElementById('lastUpdateText').innerText = now.toLocaleString('id-ID');
+
+      updateUI();
+    } catch (err) {
+      console.error("Error membaca data.txt:", err);
+      document.getElementById('tableBody').innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px;">Gagal memuat data. Pastikan file data.txt tersedia.</td></tr>`;
+    }
+  }
+
+  // Render Tabel
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const pageData = filteredData.slice(start, end);
+
+    if (pageData.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color: var(--text-muted); padding: 20px;">Data tidak ditemukan</td></tr>`;
+      return;
+    }
+
+    pageData.forEach(item => {
+      const tr = document.createElement('tr');
+      
+      // Memberikan Badge khusus Peringkat 1, 2, 3
+      let rankDisplay = item.no;
+      if (item.no === 1) rankDisplay = `<span class="rank-top rank-1">1</span>`;
+      else if (item.no === 2) rankDisplay = `<span class="rank-top rank-2">2</span>`;
+      else if (item.no === 3) rankDisplay = `<span class="rank-top rank-3">3</span>`;
+
+      tr.innerHTML = `
+        <td>${rankDisplay}</td>
+        <td>${item.username}</td>
+        <td class="text-right score-highlight">${item.turnover}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('dataRangeInfo').innerText = `Menampilkan ${start + 1}-${Math.min(end, filteredData.length)} dari ${filteredData.length} data`;
+  }
+
+  // Render Paginasi ([1] [2] [3] ... [Last] [Next])
+  function renderPagination() {
+    const container = document.getElementById('pagination');
+    container.innerHTML = '';
+    
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    if (totalPages <= 1) return;
+
+    // Tombol Prev
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'page-btn';
+    prevBtn.innerText = 'Prev';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => { currentPage--; updateUI(); };
+    container.appendChild(prevBtn);
+
+    const maxVisible = 3;
+    for (let i = 1; i <= Math.min(maxVisible, totalPages); i++) {
+      createPageBtn(i, i === currentPage);
+    }
+
+    if (totalPages > maxVisible + 1) {
+      const dots = document.createElement('span');
+      dots.className = 'dots';
+      dots.innerText = '...';
+      container.appendChild(dots);
+    }
+
+    if (totalPages > maxVisible) {
+      createPageBtn(totalPages, currentPage === totalPages);
+    }
+
+    // Tombol Next
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'page-btn';
+    nextBtn.innerText = 'Next';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => { currentPage++; updateUI(); };
+    container.appendChild(nextBtn);
+  }
+
+  function createPageBtn(page, isActive) {
+    const btn = document.createElement('button');
+    btn.className = `page-btn ${isActive ? 'active' : ''}`;
+    btn.innerText = page;
+    btn.onclick = () => { currentPage = page; updateUI(); };
+    document.getElementById('pagination').appendChild(btn);
+  }
+
+  function updateUI() {
+    renderTable();
+    renderPagination();
+  }
+
+  // Pencarian
+  function handleSearch() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    filteredData = allData.filter(item => 
+      item.username.toLowerCase().includes(query) || item.no.toString() === query
+    );
+    currentPage = 1;
+    updateUI();
+  }
+
+  document.getElementById('searchInput').addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') handleSearch();
+  });
+
+  // Load awal saat halaman dibuka
+  loadData();
+</script>
+</body>
+</html>
