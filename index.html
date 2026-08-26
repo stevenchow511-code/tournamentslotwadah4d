@@ -377,12 +377,33 @@
   </div>
 
 <script>
+  <script>
   let allData = [];
   let filteredData = [];
   let currentPage = 1;
-  const rowsPerPage = 15; // Mengatur 15 baris per halaman
+  const rowsPerPage = 15;
 
-  // Fetch / Buka File data.txt
+  // Fungsi Sensor Nama (contoh: Olib11222 -> Oli***22)
+  function maskUsername(str) {
+    if (!str) return '';
+    const len = str.length;
+    if (len <= 3) return str[0] + '*'.repeat(len - 1);
+
+    const visibleFront = 3; // Jumlah huruf depan yang terlihat
+    const visibleBack = 2;  // Jumlah huruf belakang yang terlihat
+
+    if (len <= visibleFront + visibleBack) {
+      return str.substring(0, 2) + '*'.repeat(len - 2);
+    }
+
+    const front = str.substring(0, visibleFront);
+    const back = str.substring(len - visibleBack);
+    const stars = '*'.repeat(len - (visibleFront + visibleBack));
+
+    return front + stars + back;
+  }
+
+  // Fetch / Buka File data.txt (Bisa baca koma, tab, atau spasi)
   async function loadData() {
     try {
       const response = await fetch('data.txt');
@@ -390,17 +411,43 @@
       
       const lines = text.split('\n').filter(line => line.trim() !== '');
       allData = lines.map((line, index) => {
-        const parts = line.split(',');
+        const cleanLine = line.trim();
+        let username = '';
+        let turnoverRaw = '0';
+
+        if (cleanLine.includes(',')) {
+          const parts = cleanLine.split(',');
+          username = parts[0].trim();
+          turnoverRaw = parts[1] ? parts[1].trim() : '0';
+        } else if (cleanLine.includes('\t')) {
+          const parts = cleanLine.split('\t');
+          username = parts[0].trim();
+          turnoverRaw = parts[1] ? parts[1].trim() : '0';
+        } else {
+          const lastSpaceIndex = cleanLine.lastIndexOf(' ');
+          if (lastSpaceIndex !== -1) {
+            username = cleanLine.substring(0, lastSpaceIndex).trim();
+            turnoverRaw = cleanLine.substring(lastSpaceIndex + 1).trim();
+          } else {
+            username = cleanLine;
+          }
+        }
+
+        let turnoverFormatted = turnoverRaw;
+        const numOnly = turnoverRaw.replace(/[^0-9]/g, '');
+        if (numOnly !== '') {
+          turnoverFormatted = Number(numOnly).toLocaleString('id-ID');
+        }
+
         return {
           no: index + 1,
-          username: parts[0] ? parts[0].trim() : '',
-          turnover: parts[1] ? parts[1].trim() : '0'
+          username: username,
+          turnover: turnoverFormatted
         };
       });
 
       filteredData = [...allData];
       
-      // Update Meta Info
       document.getElementById('totalDataCount').innerText = allData.length.toLocaleString('id-ID');
       const now = new Date();
       document.getElementById('lastUpdateText').innerText = now.toLocaleString('id-ID');
@@ -429,7 +476,6 @@
     pageData.forEach(item => {
       const tr = document.createElement('tr');
       
-      // Memberikan Badge khusus Peringkat 1, 2, 3
       let rankDisplay = item.no;
       if (item.no === 1) rankDisplay = `<span class="rank-top rank-1">1</span>`;
       else if (item.no === 2) rankDisplay = `<span class="rank-top rank-2">2</span>`;
@@ -437,7 +483,7 @@
 
       tr.innerHTML = `
         <td>${rankDisplay}</td>
-        <td>${item.username}</td>
+        <td>${maskUsername(item.username)}</td>
         <td class="text-right score-highlight">${item.turnover}</td>
       `;
       tbody.appendChild(tr);
@@ -446,7 +492,7 @@
     document.getElementById('dataRangeInfo').innerText = `Menampilkan ${start + 1}-${Math.min(end, filteredData.length)} dari ${filteredData.length} data`;
   }
 
-  // Render Paginasi ([1] [2] [3] ... [Last] [Next])
+  // Render Paginasi
   function renderPagination() {
     const container = document.getElementById('pagination');
     container.innerHTML = '';
@@ -454,7 +500,6 @@
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     if (totalPages <= 1) return;
 
-    // Tombol Prev
     const prevBtn = document.createElement('button');
     prevBtn.className = 'page-btn';
     prevBtn.innerText = 'Prev';
@@ -478,7 +523,6 @@
       createPageBtn(totalPages, currentPage === totalPages);
     }
 
-    // Tombol Next
     const nextBtn = document.createElement('button');
     nextBtn.className = 'page-btn';
     nextBtn.innerText = 'Next';
@@ -500,11 +544,13 @@
     renderPagination();
   }
 
-  // Pencarian
+  // Pencarian (Pengguna bisa cari dengan nama asli atau nama berbintang)
   function handleSearch() {
     const query = document.getElementById('searchInput').value.toLowerCase().trim();
     filteredData = allData.filter(item => 
-      item.username.toLowerCase().includes(query) || item.no.toString() === query
+      item.username.toLowerCase().includes(query) || 
+      maskUsername(item.username).toLowerCase().includes(query) ||
+      item.no.toString() === query
     );
     currentPage = 1;
     updateUI();
@@ -514,7 +560,6 @@
     if (e.key === 'Enter') handleSearch();
   });
 
-  // Load awal saat halaman dibuka
   loadData();
 </script>
 </body>
