@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Turnamen Kemerdekaan - Cyber Leaderboard</title>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
       --bg-color: #080711;
@@ -29,13 +31,43 @@
       background-image: 
         radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.08) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.08) 0%, transparent 40%);
-      padding-bottom: 50px;
+      padding-bottom: 70px;
     }
 
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 16px;
+    }
+
+    /* ------------------------------
+       RUNNING TEXT TICKER
+    ------------------------------ */
+    .ticker-wrap {
+      background: linear-gradient(90deg, #1f0036, #001233);
+      border-bottom: 1px solid var(--border-color);
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 8px 0;
+      font-size: 13px;
+      color: var(--accent-cyan);
+    }
+    .ticker-content {
+      display: inline-block;
+      white-space: nowrap;
+      padding-left: 100%;
+      animation: ticker 25s linear infinite;
+    }
+    @keyframes ticker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+    .ticker-item {
+      display: inline-block;
+      padding: 0 20px;
+    }
+    .ticker-item strong {
+      color: var(--accent-gold);
     }
 
     header {
@@ -80,6 +112,9 @@
       font-size: 14px;
       transition: all 0.3s ease;
       text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn-masuk {
@@ -144,10 +179,17 @@
 
     .meta-info {
       display: flex;
-      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 24px;
       font-size: 13px;
-      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .meta-badges {
+      display: flex;
+      gap: 12px;
       flex-wrap: wrap;
     }
 
@@ -162,6 +204,23 @@
     .badge-highlight {
       color: var(--accent-cyan);
       font-weight: 600;
+    }
+
+    .btn-rules {
+      background: rgba(255, 0, 127, 0.15);
+      border: 1px solid var(--accent-magenta);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-rules:hover {
+      background: var(--accent-magenta);
+      box-shadow: 0 0 12px rgba(255, 0, 127, 0.5);
     }
 
     .main-content {
@@ -265,9 +324,108 @@
     .page-btn.active { background: var(--accent-cyan); color: #000; font-weight: bold; }
     .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
     .dots { color: var(--text-muted); padding: 0 4px; }
+
+    /* ------------------------------
+       FLOATING WHATSAPP / CS BUTTON
+    ------------------------------ */
+    .float-cs-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #25d366;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 99;
+      transition: all 0.3s ease;
+    }
+    .float-cs-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.7);
+    }
+
+    /* ------------------------------
+       MODAL POPUP SYARAT & KETENTUAN
+    ------------------------------ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      padding: 16px;
+    }
+    .modal-content {
+      background: #121026;
+      border: 1px solid var(--accent-cyan);
+      border-radius: 16px;
+      max-width: 550px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 0 30px rgba(0, 242, 254, 0.3);
+      position: relative;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal-body {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-main);
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .modal-body ul {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+    .modal-body li {
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
+
+  <!-- RUNNING TEXT TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-content" id="tickerContent">
+      <span class="ticker-item">🏆 Selamat kepada <strong>User***89</strong> telah memimpin di posisi Top 1 Klasemen!</span>
+      <span class="ticker-item">🔥 Turnover terhitung otomatis dari seluruh game slot & live casino.</span>
+      <span class="ticker-item">🎁 Klaim Hadiah Utama Honda NMAX di akhir periode turnamen!</span>
+      <span class="ticker-item">⚡ Klasemen diperbarui secara berkala setiap hari.</span>
+    </div>
+  </div>
 
   <header>
     <div class="container nav-wrapper">
@@ -288,8 +446,11 @@
     </div>
 
     <div class="meta-info">
-      <div class="badge">Terakhir Update: <span class="badge-highlight" id="lastUpdateText">-</span></div>
-      <div class="badge"><span class="badge-highlight" id="totalDataCount">0</span> Data Terdata</div>
+      <div class="meta-badges">
+        <div class="badge">Terakhir Update: <span class="badge-highlight" id="lastUpdateText">-</span></div>
+        <div class="badge"><span class="badge-highlight" id="totalDataCount">0</span> Data Terdata</div>
+      </div>
+      <button class="btn-rules" onclick="openModal()">📜 Syarat & Ketentuan</button>
     </div>
 
     <div class="main-content">
@@ -363,11 +524,47 @@
     </div>
   </div>
 
+  <!-- FLOATING WHATSAPP / LIVE CHAT BUTTON -->
+  <a href="https://wa.me/" target="_blank" class="float-cs-btn">
+    💬 Bantuan Live CS
+  </a>
+
+  <!-- MODAL POPUP RULES -->
+  <div class="modal-overlay" id="rulesModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Syarat & Ketentuan Turnamen</div>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>Turnamen berlaku untuk semua member terdaftar.</li>
+          <li>Pemenang ditentukan berdasarkan akumulasi Turnover terbanyak selama periode turnamen.</li>
+          <li>Klasemen diperbarui secara berkala.</li>
+          <li>Keputusan panitia bersifat mutlak dan tidak dapat diganggu gugat.</li>
+          <li>Apabila terindikasi kecurangan, pihak penyelenggara berhak membatalkan keikutsertaan peserta.</li>
+          <li>Hadiah pemenang akan dikonfirmasi dan dikirimkan maksimal 3x24 jam setelah periode turnamen berakhir.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
 <script>
   let allData = [];
   let filteredData = [];
   let currentPage = 1;
   const rowsPerPage = 15;
+
+  // ANIMASI KONFETI SAAT PERTAMA KALI HALAMAN DIBUKA
+  window.addEventListener('load', () => {
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  });
 
   function maskUsername(str) {
     if (!str) return '';
@@ -540,6 +737,20 @@
   document.getElementById('searchInput').addEventListener('keyup', (e) => {
     if (e.key === 'Enter') handleSearch();
   });
+
+  // MODAL FUNCTIONS
+  function openModal() {
+    document.getElementById('rulesModal').style.display = 'flex';
+  }
+  function closeModal() {
+    document.getElementById('rulesModal').style.display = 'none';
+  }
+  window.onclick = function(event) {
+    const modal = document.getElementById('rulesModal');
+    if (event.target === modal) {
+      closeModal();
+    }
+  }
 
   loadData();
 </script>
