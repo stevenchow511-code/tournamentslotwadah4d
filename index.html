@@ -38,7 +38,6 @@
       padding: 0 16px;
     }
 
-    /* Header Navbar */
     header {
       background: rgba(8, 7, 17, 0.85);
       backdrop-filter: blur(10px);
@@ -107,7 +106,6 @@
       transform: translateY(-2px);
     }
 
-    /* Banner Event */
     .banner-wrapper {
       position: relative;
       border-radius: 16px;
@@ -144,7 +142,6 @@
       font-size: 14px;
     }
 
-    /* Info Status */
     .meta-info {
       display: flex;
       gap: 12px;
@@ -167,7 +164,6 @@
       font-weight: 600;
     }
 
-    /* Layout Content Grid */
     .main-content {
       display: grid;
       grid-template-columns: 2fr 1fr;
@@ -178,7 +174,6 @@
       .main-content { grid-template-columns: 1fr; }
     }
 
-    /* Card Box */
     .card {
       background: var(--card-bg);
       backdrop-filter: blur(12px);
@@ -195,7 +190,6 @@
       color: #fff;
     }
 
-    /* Search Container */
     .search-container {
       display: flex;
       gap: 10px;
@@ -218,7 +212,6 @@
       box-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
     }
 
-    /* Table Styles */
     .table-container { overflow-x: auto; }
     table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
     th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 10px 12px; text-align: left; }
@@ -230,7 +223,6 @@
     .text-right { text-align: right; }
     .score-highlight { color: var(--accent-cyan); font-weight: 600; font-family: 'Courier New', monospace; }
 
-    /* Top 3 Badge Badges */
     .rank-top {
       display: inline-block;
       width: 24px;
@@ -245,13 +237,11 @@
     .rank-2 { background: #e0e0e0; box-shadow: 0 0 8px #e0e0e0; }
     .rank-3 { background: #cd7f32; box-shadow: 0 0 8px #cd7f32; }
 
-    /* Hadiah List */
     .hadiah-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .hadiah-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.02); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.04); font-size: 13px; }
     .hadiah-rank { font-weight: 700; color: var(--accent-magenta); }
     .hadiah-prize { color: #fff; font-weight: 600; }
 
-    /* Pagination */
     .pagination-wrapper {
       display: flex;
       justify-content: space-between;
@@ -298,13 +288,12 @@
     </div>
 
     <div class="meta-info">
-      <div class="badge">Terakhir Update: 25-Agustus-2026<span class="badge-highlight" id="lastUpdateText"></span></div>
+      <div class="badge">Terakhir Update: <span class="badge-highlight" id="lastUpdateText">-</span></div>
       <div class="badge"><span class="badge-highlight" id="totalDataCount">0</span> Data Terdata</div>
     </div>
 
     <div class="main-content">
       
-      <!-- Leaderboard -->
       <div class="card">
         <h2 class="card-title">Papan Klasemen</h2>
         
@@ -323,7 +312,6 @@
               </tr>
             </thead>
             <tbody id="tableBody">
-              <!-- Data akan dimasukkan oleh JavaScript -->
             </tbody>
           </table>
         </div>
@@ -334,7 +322,6 @@
         </div>
       </div>
 
-      <!-- Hadiah List -->
       <div class="card">
         <h2 class="card-title">Daftar Hadiah</h2>
         <div class="hadiah-list">
@@ -377,20 +364,18 @@
   </div>
 
 <script>
-  <script>
   let allData = [];
   let filteredData = [];
   let currentPage = 1;
   const rowsPerPage = 15;
 
-  // Fungsi Sensor Nama (contoh: Olib11222 -> Oli***22)
   function maskUsername(str) {
     if (!str) return '';
     const len = str.length;
     if (len <= 3) return str[0] + '*'.repeat(len - 1);
 
-    const visibleFront = 3; // Jumlah huruf depan yang terlihat
-    const visibleBack = 2;  // Jumlah huruf belakang yang terlihat
+    const visibleFront = 3;
+    const visibleBack = 2;
 
     if (len <= visibleFront + visibleBack) {
       return str.substring(0, 2) + '*'.repeat(len - 2);
@@ -403,7 +388,6 @@
     return front + stars + back;
   }
 
-  // Fetch / Buka File data.txt (Bisa baca koma, tab, atau spasi)
   async function loadData() {
     try {
       const response = await fetch('data.txt');
@@ -459,7 +443,6 @@
     }
   }
 
-  // Render Tabel
   function renderTable() {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
@@ -492,7 +475,6 @@
     document.getElementById('dataRangeInfo').innerText = `Menampilkan ${start + 1}-${Math.min(end, filteredData.length)} dari ${filteredData.length} data`;
   }
 
-  // Render Paginasi
   function renderPagination() {
     const container = document.getElementById('pagination');
     container.innerHTML = '';
@@ -544,7 +526,6 @@
     renderPagination();
   }
 
-  // Pencarian (Pengguna bisa cari dengan nama asli atau nama berbintang)
   function handleSearch() {
     const query = document.getElementById('searchInput').value.toLowerCase().trim();
     filteredData = allData.filter(item => 
