@@ -1,18 +1,159 @@
-<div class="card" id="adminPanel" style="display:none; width: 450px;">
-    <h2>Dashboard Admin</h2>
-    
-    <div style="text-align: left; margin-bottom: 15px;">
-      <label>Judul Promo / Banner:</label>
-      <input type="text" id="inputJudul" placeholder="Masukkan judul baru">
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Editor Data Klasemen</title>
+  <style>
+    :root {
+      --bg-color: #080711;
+      --card-bg: rgba(18, 16, 38, 0.9);
+      --accent-cyan: #00f2fe;
+      --accent-magenta: #ff007f;
+      --border-color: rgba(0, 242, 254, 0.2);
+    }
+    body {
+      background-color: var(--bg-color);
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 30px 15px;
+      margin: 0;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 25px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+    }
+    h2 { margin-top: 0; color: var(--accent-cyan); text-align: center; }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 16px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    textarea { height: 200px; font-family: monospace; resize: vertical; }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .btn-submit { background: linear-gradient(135deg, var(--accent-cyan), #4facfe); color: #000; }
+    .btn-download { background: linear-gradient(135deg, var(--accent-magenta), #ff5252); color: #fff; }
+    .btn-logout { background: #333; color: #fff; }
+    .form-group { text-align: left; }
+    label { font-size: 13px; color: var(--accent-cyan); }
+  </style>
+</head>
+<body>
 
-      <label>Link Target / Tombol:</label>
-      <input type="text" id="inputLink" placeholder="https://...">
+  <!-- LOGIN BOX -->
+  <div class="card" id="loginBox" style="max-width: 350px;">
+    <h2>LOGIN ADMIN</h2>
+    <input type="password" id="passInput" placeholder="Masukkan Password Admin">
+    <button class="btn btn-submit" onclick="login()">Masuk</button>
+  </div>
 
-      <label>URL Gambar Promo:</label>
-      <input type="text" id="inputGambar" placeholder="https://.../gambar.jpg">
+  <!-- MAIN ADMIN PANEL -->
+  <div class="card" id="adminPanel" style="display: none;">
+    <h2>Kelola Data Klasemen</h2>
 
-      <button onclick="simpanData()" style="background: #28a745; margin-top: 10px;">Simpan Perubahan</button>
+    <!-- FORM INPUT SATUAN -->
+    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+      <h3>+ Tambah Player Baru</h3>
+      <div class="form-group">
+        <label>Username Player:</label>
+        <input type="text" id="addUsername" placeholder="Contoh: user123">
+      </div>
+      <div class="form-group">
+        <label>Turnover:</label>
+        <input type="text" id="addTurnover" placeholder="Contoh: 50000000">
+      </div>
+      <button class="btn btn-submit" onclick="tambahData()">Sisipkan ke Atas</button>
     </div>
 
-    <button onclick="logout()" style="background:#dc3545;">Logout</button>
+    <!-- RAW TEXTAREA DATA.TXT -->
+    <div class="form-group">
+      <label>Isi Lengkap File data.txt (Format: Username,Turnover):</label>
+      <textarea id="rawData"></textarea>
+    </div>
+
+    <button class="btn btn-download" onclick="downloadTxt()">📥 Download data.txt Baru</button>
+    <button class="btn btn-logout" onclick="logout()">Logout</button>
   </div>
+
+  <script>
+    function login() {
+      const pass = document.getElementById('passInput').value;
+      if (pass === "admin123") { // Ubah password sesuai keinginan
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadCurrentData();
+      } else {
+        alert("Password Salah!");
+      }
+    }
+
+    function logout() {
+      document.getElementById('loginBox').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'none';
+    }
+
+    // Ambil data.txt saat ini dari website
+    async function loadCurrentData() {
+      try {
+        const res = await fetch('data.txt');
+        if (res.ok) {
+          const text = await res.text();
+          document.getElementById('rawData').value = text;
+        }
+      } catch (e) {
+        console.log("Belum ada data.txt atau gagal memuat.");
+      }
+    }
+
+    // Tambah player baru ke baris paling atas
+    function tambahData() {
+      const user = document.getElementById('addUsername').value.trim();
+      const to = document.getElementById('addTurnover').value.trim();
+
+      if (!user || !to) {
+        alert("Username dan Turnover harus diisi!");
+        return;
+      }
+
+      const area = document.getElementById('rawData');
+      const newLine = `${user},${to}`;
+      area.value = area.value ? newLine + "\n" + area.value : newLine;
+
+      document.getElementById('addUsername').value = '';
+      document.getElementById('addTurnover').value = '';
+      alert("Pemain berhasil ditambahkan ke daftar!");
+    }
+
+    // Download file data.txt langsung
+    function downloadTxt() {
+      const content = document.getElementById('rawData').value;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'data.txt';
+      a.click();
+    }
+  </script>
+</body>
+</html>
