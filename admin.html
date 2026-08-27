@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background: #1e1e1e; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); width: 320px; text-align: center; }
+    input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #333; background: #2a2a2a; color: #fff; border-radius: 4px; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background: #007bff; border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="loginBox">
+    <h2>Login Admin</h2>
+    <input type="password" id="passInput" placeholder="Masukkan Password Admin">
+    <button onclick="login()">Masuk</button>
+  </div>
+
+  <div class="card" id="adminPanel" style="display:none;">
+    <h2>Dashboard Admin</h2>
+    <p>Selamat datang di Panel Admin!</p>
+    <!-- Tambahkan fitur/form kelola data kamu di sini -->
+    <button onclick="logout()" style="background:#dc3545;">Logout</button>
+  </div>
+
+  <script>
+    function login() {
+      const pass = document.getElementById('passInput').value;
+      if(pass === "admin123") { // Ganti dengan password yang kamu mau
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+      } else {
+        alert("Password Salah!");
+      }
+    }
+
+    function logout() {
+      document.getElementById('loginBox').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
