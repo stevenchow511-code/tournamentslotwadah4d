@@ -3,36 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
+  <title>Admin - Update Klasemen</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .card { background: #1e1e1e; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); width: 320px; text-align: center; }
+    body { font-family: Arial, sans-serif; background: #121212; color: #fff; display: flex; justify-content: center; padding: 40px 10px; margin: 0; }
+    .card { background: #1e1e1e; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); width: 100%; max-width: 500px; text-align: center; }
     input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #333; background: #2a2a2a; color: #fff; border-radius: 4px; box-sizing: border-box; }
-    button { width: 100%; padding: 10px; background: #007bff; border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    button { width: 100%; padding: 10px; background: #007bff; border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 5px; }
     button:hover { background: #0056b3; }
+    table { width: 100%; margin-top: 15px; border-collapse: collapse; text-align: left; }
+    th, td { padding: 8px; border-bottom: 1px solid #333; font-size: 14px; }
+    th { background: #2a2a2a; }
+    .btn-del { background: #dc3545; padding: 4px 8px; font-size: 12px; width: auto; }
   </style>
 </head>
 <body>
 
+  <!-- Box Login -->
   <div class="card" id="loginBox">
     <h2>Login Admin</h2>
     <input type="password" id="passInput" placeholder="Masukkan Password Admin">
     <button onclick="login()">Masuk</button>
   </div>
 
+  <!-- Box Panel Admin Klasemen -->
   <div class="card" id="adminPanel" style="display:none;">
-    <h2>Dashboard Admin</h2>
-    <p>Selamat datang di Panel Admin!</p>
-    <!-- Tambahkan fitur/form kelola data kamu di sini -->
-    <button onclick="logout()" style="background:#dc3545;">Logout</button>
+    <h2>Update Papan Klasemen</h2>
+    
+    <div style="text-align: left; margin-bottom: 20px;">
+      <label>Nama / Username Player:</label>
+      <input type="text" id="playerName" placeholder="Contoh: Player 1">
+
+      <label>Poin / Skor:</label>
+      <input type="number" id="playerScore" placeholder="Contoh: 1500">
+
+      <button onclick="tambahPemain()" style="background: #28a745;">+ Tambah ke Klasemen</button>
+    </div>
+
+    <h3>Daftar Klasemen Saat Ini</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Peringkat</th>
+          <th>Nama</th>
+          <th>Skor</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="adminTableBody">
+        <!-- Data klasemen akan muncul di sini -->
+      </tbody>
+    </table>
+
+    <button onclick="logout()" style="background:#6c757d; margin-top: 25px;">Logout</button>
   </div>
 
   <script>
+    // Password admin sederhana
     function login() {
       const pass = document.getElementById('passInput').value;
-      if(pass === "admin123") { // Ganti dengan password yang kamu mau
+      if(pass === "admin123") {
         document.getElementById('loginBox').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
+        tampilkanDataAdmin();
       } else {
         alert("Password Salah!");
       }
@@ -41,6 +73,58 @@
     function logout() {
       document.getElementById('loginBox').style.display = 'block';
       document.getElementById('adminPanel').style.display = 'none';
+    }
+
+    function ambilData() {
+      return JSON.parse(localStorage.getItem('klasemenData')) || [];
+    }
+
+    function tambahPemain() {
+      const nama = document.getElementById('playerName').value;
+      const skor = parseInt(document.getElementById('playerScore').value);
+
+      if(!nama || isNaN(skor)) {
+        alert("Mohon isi nama dan skor dengan benar!");
+        return;
+      }
+
+      let data = ambilData();
+      data.push({ nama, skor });
+      
+      // Urutkan dari skor tertinggi ke terendah
+      data.sort((a, b) => b.skor - a.skor);
+
+      localStorage.setItem('klasemenData', JSON.stringify(data));
+      
+      document.getElementById('playerName').value = '';
+      document.getElementById('playerScore').value = '';
+      
+      tampilkanDataAdmin();
+      alert("Data berhasil ditambahkan!");
+    }
+
+    function hapusPemain(index) {
+      let data = ambilData();
+      data.splice(index, 1);
+      localStorage.setItem('klasemenData', JSON.stringify(data));
+      tampilkanDataAdmin();
+    }
+
+    function tampilkanDataAdmin() {
+      const tbody = document.getElementById('adminTableBody');
+      const data = ambilData();
+      tbody.innerHTML = '';
+
+      data.forEach((item, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>#${index + 1}</td>
+            <td>${item.nama}</td>
+            <td>${item.skor}</td>
+            <td><button class="btn-del" onclick="hapusPemain(${index})">Hapus</button></td>
+          </tr>
+        `;
+      });
     }
   </script>
 </body>
