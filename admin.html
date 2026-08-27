@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - Editor Data Klasemen</title>
+  <title>Admin Panel - Auto Save Klasemen</title>
   <style>
     :root {
       --bg-color: #080711;
-      --card-bg: rgba(18, 16, 38, 0.9);
+      --card-bg: rgba(18, 16, 38, 0.95);
       --accent-cyan: #00f2fe;
       --accent-magenta: #ff007f;
       --border-color: rgba(0, 242, 254, 0.2);
@@ -30,7 +30,7 @@
       max-width: 600px;
       box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
     }
-    h2 { margin-top: 0; color: var(--accent-cyan); text-align: center; }
+    h2, h3 { color: var(--accent-cyan); text-align: center; }
     input, textarea {
       width: 100%;
       padding: 10px;
@@ -41,7 +41,7 @@
       border-radius: 6px;
       box-sizing: border-box;
     }
-    textarea { height: 200px; font-family: monospace; resize: vertical; }
+    textarea { height: 180px; font-family: monospace; }
     .btn {
       width: 100%;
       padding: 12px;
@@ -53,10 +53,10 @@
       margin-bottom: 10px;
     }
     .btn-submit { background: linear-gradient(135deg, var(--accent-cyan), #4facfe); color: #000; }
-    .btn-download { background: linear-gradient(135deg, var(--accent-magenta), #ff5252); color: #fff; }
+    .btn-save { background: linear-gradient(135deg, #28a745, #20c997); color: #fff; font-size: 16px; }
     .btn-logout { background: #333; color: #fff; }
-    .form-group { text-align: left; }
     label { font-size: 13px; color: var(--accent-cyan); }
+    .status-box { padding: 10px; border-radius: 6px; margin-bottom: 10px; text-align: center; font-weight: bold; display: none; }
   </style>
 </head>
 <body>
@@ -68,40 +68,55 @@
     <button class="btn btn-submit" onclick="login()">Masuk</button>
   </div>
 
-  <!-- MAIN ADMIN PANEL -->
+  <!-- MAIN PANEL -->
   <div class="card" id="adminPanel" style="display: none;">
-    <h2>Kelola Data Klasemen</h2>
+    <h2>Update Klasemen Otomatis</h2>
+    <div id="statusMsg" class="status-box"></div>
 
-    <!-- FORM INPUT SATUAN -->
-    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <!-- PENGATURAN GITHUB TOKEN -->
+    <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+      <label>GitHub Personal Access Token:</label>
+      <input type="password" id="ghToken" placeholder="Paste Token ghp_xxx di sini">
+      <small style="color: #aaa; font-size: 11px;">*Token disimpan otomatis di browser kamu.</small>
+    </div>
+
+    <!-- FORM INPUT NAMA & TURNOVER -->
+    <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
       <h3>+ Tambah Player Baru</h3>
-      <div class="form-group">
-        <label>Username Player:</label>
-        <input type="text" id="addUsername" placeholder="Contoh: user123">
-      </div>
-      <div class="form-group">
-        <label>Turnover:</label>
-        <input type="text" id="addTurnover" placeholder="Contoh: 50000000">
-      </div>
-      <button class="btn btn-submit" onclick="tambahData()">Sisipkan ke Atas</button>
+      <label>Username Player:</label>
+      <input type="text" id="addUsername" placeholder="Contoh: user123">
+      
+      <label>Turnover:</label>
+      <input type="text" id="addTurnover" placeholder="Contoh: 50000000">
+      
+      <button class="btn btn-submit" onclick="tambahData()">Sisipkan ke Daftar</button>
     </div>
 
-    <!-- RAW TEXTAREA DATA.TXT -->
-    <div class="form-group">
-      <label>Isi Lengkap File data.txt (Format: Username,Turnover):</label>
-      <textarea id="rawData"></textarea>
-    </div>
+    <!-- TEXTAREA DATA.TXT -->
+    <label>Isi File data.txt saat ini (Format: username,turnover):</label>
+    <textarea id="rawData"></textarea>
 
-    <button class="btn btn-download" onclick="downloadTxt()">📥 Download data.txt Baru</button>
+    <!-- TOMBOL UPDATE OTOMATIS -->
+    <button class="btn btn-save" id="btnSave" onclick="uploadKeGithub()">🚀 Upload & Publish ke Website</button>
     <button class="btn btn-logout" onclick="logout()">Logout</button>
   </div>
 
   <script>
+    // Konfigurasi Repository GitHub Kamu
+    const GITHUB_USERNAME = "stevenchow511-code"; // Username GitHub kamu
+    const REPO_NAME = "tournamentslotwadah4d";   // Ganti jika nama repository berbeda
+    const FILE_PATH = "data.txt";                 // Nama file yang diupdate
+
     function login() {
       const pass = document.getElementById('passInput').value;
-      if (pass === "admin123") { // Ubah password sesuai keinginan
+      if (pass === "admin123") {
         document.getElementById('loginBox').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
+        
+        // Load token tersimpan jika ada
+        const savedToken = localStorage.getItem('gh_token_saved');
+        if(savedToken) document.getElementById('ghToken').value = savedToken;
+        
         loadCurrentData();
       } else {
         alert("Password Salah!");
@@ -113,26 +128,24 @@
       document.getElementById('adminPanel').style.display = 'none';
     }
 
-    // Ambil data.txt saat ini dari website
     async function loadCurrentData() {
       try {
-        const res = await fetch('data.txt');
+        const res = await fetch('data.txt?t=' + Date.now());
         if (res.ok) {
           const text = await res.text();
           document.getElementById('rawData').value = text;
         }
       } catch (e) {
-        console.log("Belum ada data.txt atau gagal memuat.");
+        console.log("Gagal memuat data.txt");
       }
     }
 
-    // Tambah player baru ke baris paling atas
     function tambahData() {
       const user = document.getElementById('addUsername').value.trim();
       const to = document.getElementById('addTurnover').value.trim();
 
       if (!user || !to) {
-        alert("Username dan Turnover harus diisi!");
+        alert("Username dan Turnover wajib diisi!");
         return;
       }
 
@@ -142,17 +155,77 @@
 
       document.getElementById('addUsername').value = '';
       document.getElementById('addTurnover').value = '';
-      alert("Pemain berhasil ditambahkan ke daftar!");
     }
 
-    // Download file data.txt langsung
-    function downloadTxt() {
+    async function uploadKeGithub() {
+      const token = document.getElementById('ghToken').value.trim();
       const content = document.getElementById('rawData').value;
-      const blob = new Blob([content], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'data.txt';
-      a.click();
+      const statusBox = document.getElementById('statusMsg');
+      const btnSave = document.getElementById('btnSave');
+
+      if (!token) {
+        alert("Masukkan GitHub Personal Access Token terlebih dahulu!");
+        return;
+      }
+
+      // Simpan token ke localStorage browser agar tidak perlu ketik ulang nanti
+      localStorage.setItem('gh_token_saved', token);
+
+      btnSave.disabled = true;
+      btnSave.innerText = "Mengunggah...";
+      statusBox.style.display = 'block';
+      statusBox.style.background = '#ffc107';
+      statusBox.style.color = '#000';
+      statusBox.innerText = "Sedang memproses upload ke GitHub...";
+
+      try {
+        // 1. Dapatkan SHA file data.txt yang lama
+        const getFileRes = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${FILE_PATH}`, {
+          headers: { Authorization: `token ${token}` }
+        });
+
+        let sha = "";
+        if (getFileRes.ok) {
+          const fileData = await getFileRes.json();
+          sha = fileData.sha;
+        }
+
+        // 2. Encode konten baru ke format Base64 (UTF-8 safe)
+        const utf8Bytes = new TextEncoder().encode(content);
+        let binaryString = "";
+        utf8Bytes.forEach(b => binaryString += String.fromCharCode(b));
+        const encodedContent = btoa(binaryString);
+
+        // 3. Kirim pembaruan ke GitHub API
+        const updateRes = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${FILE_PATH}`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `token ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: "Update data.txt dari Panel Admin",
+            content: encodedContent,
+            sha: sha ? sha : undefined
+          })
+        });
+
+        if (updateRes.ok) {
+          statusBox.style.background = '#28a745';
+          statusBox.style.color = '#fff';
+          statusBox.innerText = "✅ BERHASIL! Data ter-upload ke GitHub. Cloudflare akan memperbarui website dalam 1 menit.";
+        } else {
+          const errData = await updateRes.json();
+          throw new Error(errData.message || "Gagal mengunggah");
+        }
+      } catch (err) {
+        statusBox.style.background = '#dc3545';
+        statusBox.style.color = '#fff';
+        statusBox.innerText = "❌ GAGAL: " + err.message;
+      } finally {
+        btnSave.disabled = false;
+        btnSave.innerText = "🚀 Upload & Publish ke Website";
+      }
     }
   </script>
 </body>
