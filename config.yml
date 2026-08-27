@@ -1,0 +1,17 @@
+backend:
+  name: github
+  repo: username-stevenchow511-code/tournamentslotwadah4d
+  branch: main # Atau master
+
+media_folder: "images"
+public_folder: "/images"
+
+collections:
+  - name: "blog"
+    label: "Blog"
+    folder: "content/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Body", name: "body", widget: "markdown"}
